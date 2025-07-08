@@ -3,7 +3,8 @@
 
 void vulnerable_function(char *input) {
     char buffer[10];
-    strcpy(buffer, input); // Vulnerability: buffer overflow
+    strncpy(buffer, input, sizeof(buffer) - 1); // Safe copy with size limit
+    buffer[sizeof(buffer) - 1] = '\0'; // Ensure null termination
     std::cout << "Buffer content: " << buffer << std::endl;
 }
 
