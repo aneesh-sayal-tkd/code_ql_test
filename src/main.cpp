@@ -1,18 +1,20 @@
+// src/main.cpp
 #include <iostream>
-#include <cstring>
+#include <string>
 
-void vulnerable_function(char *input) {
-    char buffer[10];
-    strncpy(buffer, input, sizeof(buffer) - 1); // Safe copy with size limit
-    buffer[sizeof(buffer) - 1] = '\0'; // Ensure null termination
-    std::cout << "Buffer content: " << buffer << std::endl;
-}
+extern bool authenticate(const std::string&, const std::string&);
 
-int main(int argc, char *argv[]) {
-    if (argc > 1) {
-        vulnerable_function(argv[1]);
+int main() {
+    std::string username, password;
+    std::cout << "Username: ";
+    std::cin >> username;
+    std::cout << "Password: ";
+    std::cin >> password;
+
+    if (authenticate(username, password)) {
+        std::cout << "Login successful!" << std::endl;
     } else {
-        std::cout << "Provide an argument." << std::endl;
+        std::cout << "Login failed!" << std::endl;
     }
     return 0;
 }
