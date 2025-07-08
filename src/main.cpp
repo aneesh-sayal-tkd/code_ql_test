@@ -1,20 +1,13 @@
-// src/main.cpp
+// main.cpp
 #include <iostream>
-#include <string>
 
-extern bool authenticate(const std::string&, const std::string&);
+extern void copy_input(const char*);
 
-int main() {
-    std::string username, password;
-    std::cout << "Username: ";
-    std::cin >> username;
-    std::cout << "Password: ";
-    std::cin >> password;
-
-    if (authenticate(username, password)) {
-        std::cout << "Login successful!" << std::endl;
+int main(int argc, char* argv[]) {
+    if (argc > 1) {
+        copy_input(argv[1]);
     } else {
-        std::cout << "Login failed!" << std::endl;
+        std::cout << "Please provide an argument." << std::endl;
     }
     return 0;
 }
