@@ -39,7 +39,7 @@ jobs:
       - name: Build C++ code
         if: matrix.build-mode == 'manual'
         run: |
-          g++ -o myapp src/main.cpp
+          g++ -o myapp src/main.cpp src/login.cpp
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
