@@ -1,7 +1,8 @@
 #include <iostream>
 
-void vulnerable();  // Declaration from vulnerable.cpp
-void greet();       // Declaration from more.cpp
+// Declaration
+void vulnerable();  
+void greet();       
 
 int main() {
     greet();
