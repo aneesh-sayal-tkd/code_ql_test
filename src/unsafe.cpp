@@ -1,9 +1,12 @@
-// unsafe.cpp
 #include <iostream>
 #include <cstring>
+#include <cstdlib>
 
-void copy_input(const char* input) {
-    char buffer[8];
-    strcpy(buffer, input); // 🚨 Buffer overflow
-    std::cout << "Buffer contains: " << buffer << std::endl;
+void vulnerable() {
+    char dest[10];
+    char* src = getenv("USER");  // ← source of untrusted data
+    if (src != nullptr) {
+        strcpy(dest, src);       // 🚨 Vulnerable: no bounds checking
+        std::cout << "Copied username: " << dest << std::endl;
+    }
 }

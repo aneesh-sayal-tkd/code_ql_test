@@ -1,13 +1,10 @@
-// main.cpp
 #include <iostream>
 
-extern void copy_input(const char*);
+void vulnerable();  // Declaration from vulnerable.cpp
+void greet();       // Declaration from more.cpp
 
-int main(int argc, char* argv[]) {
-    if (argc > 1) {
-        copy_input(argv[1]);
-    } else {
-        std::cout << "Please provide an argument." << std::endl;
-    }
+int main() {
+    greet();
+    vulnerable();
     return 0;
 }

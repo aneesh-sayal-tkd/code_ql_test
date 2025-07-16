@@ -1,9 +1,5 @@
-#include <string>
-#include <cstring>
+#include <iostream>
 
-const char* ADMIN_USERNAME = "admin";  // 👈 const global
-const char* ADMIN_PASSWORD = "1234";  // 👈 const global (more detectable)
-
-bool authenticate(const std::string& username, const std::string& password) {
-    return (username == ADMIN_USERNAME && password == ADMIN_PASSWORD);
+void greet() {
+    std::cout << "Welcome to the CodeQL demo!" << std::endl;
 }
