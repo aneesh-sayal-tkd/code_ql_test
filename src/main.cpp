@@ -1,13 +1,9 @@
-// main.cpp
-#include <iostream>
+import os
 
-extern void copy_input(const char*);
+def delete_file():
+    filename = input("Enter the file name to delete: ")
+    # 🚨 Vulnerability: Unsanitized user input in shell command
+    os.system(f"rm {filename}")
 
-int main(int argc, char* argv[]) {
-    if (argc > 1) {
-        copy_input(argv[1]);
-    } else {
-        std::cout << "Please provide an argument." << std::endl;
-    }
-    return 0;
-}
+if __name__ == "__main__":
+    delete_file()
