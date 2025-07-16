@@ -1,9 +1,21 @@
-import os
+#include <iostream>
+#include <cstring>
 
-def delete_file():
-    filename = input("Enter the file name to delete: ")
-    # 🚨 Vulnerability: Unsanitized user input in shell command
-    os.system(f"rm {filename}")
+void vulnerableFunction() {
+    char buffer[10];
+    std::cout << "Enter your name: ";
+    std::cin >> buffer; // 🚨 Potential buffer overflow (unsafe input into fixed buffer)
 
-if __name__ == "__main__":
-    delete_file()
+    char dest[10];
+    char *src = getenv("USER"); // Using environment variable (could be long)
+    if (src != nullptr) {
+        strcpy(dest, src); // 🚨 Unsafe function, no bounds checking (possible overflow)
+    }
+
+    std::cout << "Hello, " << buffer << std::endl;
+}
+
+int main() {
+    vulnerableFunction();
+    return 0;
+}
