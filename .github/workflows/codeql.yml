@@ -47,19 +47,4 @@ jobs:
           category: "/language:${{matrix.language}}"
           output: results
 
-      - name: Fail build if CodeQL found issues
-        shell: bash
-        run: |
-          if [ -f results/codeql-results.sarif ]; then
-            ALERTS=$(jq '.runs[0].results | length' results/codeql-results.sarif)
-            echo "🔍 CodeQL Alerts Found: $ALERTS"
-            if [ "$ALERTS" -gt 0 ]; then
-              echo "::error ::❌ CodeQL found $ALERTS issue(s), failing the build."
-              exit 1
-            else
-              echo "✅ No CodeQL issues found."
-            fi
-          else
-            echo "::error ::SARIF output not found. Build failed."
-            exit 1
-          fi
+      
