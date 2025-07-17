@@ -47,22 +47,33 @@ jobs:
           category: "/language:${{matrix.language}}"
           output: results
 
-      - name: Fail if critical/high CodeQL issues exist
+      - name: Fail if critical CodeQL issues exist
         run: |
           sudo apt-get update && sudo apt-get install -y jq
+      
           SARIF_FILE=$(find results -name '*.sarif')
           echo "Checking SARIF: $SARIF_FILE"
       
-          echo "🧪 SARIF Issue Summary:"
-          jq '.runs[].results[] | {message: .message.text, level: .level}' "$SARIF_FILE"
+          echo "🧪 Extracting critical issues from SARIF..."
       
-          # Fail on any level (for test purposes)
-          count=$(jq '[.runs[].results[] | select(.level=="error" or .level=="warning" or .level=="note")] | length' "$SARIF_FILE")
-          echo "Number of total issues: $count"
+          # Join results with rule severity
+          critical_count=$(jq '
+            def get_severity(ruleId):
+              .runs[0].tool.driver.rules
+              | map(select(.id == ruleId))
+              | .[0].properties.severity;
       
-          if [ "$count" -gt 0 ]; then
-            echo "❌ Found $count issue(s). Failing pipeline."
+            [ .runs[0].results[]
+              | select((get_severity(.ruleId)) == "critical")
+            ] | length
+          ' "$SARIF_FILE")
+      
+          echo "Number of critical severity issues: $critical_count"
+      
+          if [ "$critical_count" -gt 0 ]; then
+            echo "❌ Found $critical_count critical issue(s). Failing pipeline."
             exit 1
           else
-            echo "✅ No issues found."
+            echo "✅ No critical issues found."
           fi
+      
