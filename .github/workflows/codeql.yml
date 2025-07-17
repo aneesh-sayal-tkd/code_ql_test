@@ -10,7 +10,7 @@ on:
 
 jobs:
   analyze:
-    name: Analyze C++
+    name: Analyze C++ Code
     runs-on: ubuntu-22.04
     permissions:
       security-events: write
@@ -47,4 +47,19 @@ jobs:
           category: "/language:${{matrix.language}}"
           output: results
 
-      
+      - name: Fail if critical/high CodeQL issues exist
+        run: |
+          apt-get update && apt-get install -y jq
+          SARIF_FILE=$(find results -name '*.sarif')
+          echo "Checking SARIF: $SARIF_FILE"
+
+          # Count critical or high severity findings
+          count=$(jq '[.runs[].results[] | select(.level=="error" or .level=="warning")] | length' "$SARIF_FILE")
+          echo "Number of critical/high issues: $count"
+
+          if [ "$count" -gt 0 ]; then
+            echo "❌ Found $count critical/high severity issues. Failing pipeline."
+            exit 1
+          else
+            echo "✅ No critical/high issues found."
+          fi
