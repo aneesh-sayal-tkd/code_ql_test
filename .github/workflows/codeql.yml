@@ -56,16 +56,27 @@ jobs:
       
           echo "🧪 Extracting critical issues from SARIF..."
       
-          # Join results with rule severity
+          # Defensive SARIF parser for critical-level issues
           critical_count=$(jq '
-            def get_severity(ruleId):
-              .runs[0].tool.driver.rules
-              | map(select(.id == ruleId))
-              | .[0].properties.severity;
+            def rule_severity_map:
+              reduce .runs[].tool.driver.rules[] as $rule
+                ({}; .[$rule.id] = ($rule.properties.severity // "none"));
       
-            [ .runs[0].results[]
-              | select((get_severity(.ruleId)) == "critical")
-            ] | length
+            def is_critical($map; $rid):
+              ($map[$rid] == "critical");
+      
+            .runs
+            | map(
+                {
+                  rule_map: rule_severity_map,
+                  critical_results: [
+                    .results[]?
+                    | select(is_critical(rule_map; .ruleId))
+                  ]
+                }
+              )
+            | map(.critical_results | length)
+            | add
           ' "$SARIF_FILE")
       
           echo "Number of critical severity issues: $critical_count"
@@ -76,4 +87,3 @@ jobs:
           else
             echo "✅ No critical issues found."
           fi
-      
