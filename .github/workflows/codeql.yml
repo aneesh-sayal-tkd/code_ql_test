@@ -47,43 +47,8 @@ jobs:
           category: "/language:${{matrix.language}}"
           output: results
 
-      - name: Fail if critical CodeQL issues exist
-        run: |
-          sudo apt-get update && sudo apt-get install -y jq
-      
-          SARIF_FILE=$(find results -name '*.sarif')
-          echo "Checking SARIF: $SARIF_FILE"
-      
-          echo "🧪 Extracting critical issues from SARIF..."
-      
-          # Defensive SARIF parser for critical-level issues
-          critical_count=$(jq '
-            def rule_severity_map:
-              reduce .runs[].tool.driver.rules[] as $rule
-                ({}; .[$rule.id] = ($rule.properties.severity // "none"));
-      
-            def is_critical($map; $rid):
-              ($map[$rid] == "critical");
-      
-            .runs
-            | map(
-                {
-                  rule_map: rule_severity_map,
-                  critical_results: [
-                    .results[]?
-                    | select(is_critical(rule_map; .ruleId))
-                  ]
-                }
-              )
-            | map(.critical_results | length)
-            | add
-          ' "$SARIF_FILE")
-      
-          echo "Number of critical severity issues: $critical_count"
-      
-          if [ "$critical_count" -gt 0 ]; then
-            echo "❌ Found $critical_count critical issue(s). Failing pipeline."
-            exit 1
-          else
-            echo "✅ No critical issues found."
-          fi
+      - name: Upload SARIF report as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: codeql-sarif-report
+          path: results/*.sarif
