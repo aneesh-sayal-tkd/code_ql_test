@@ -49,17 +49,20 @@ jobs:
 
       - name: Fail if critical/high CodeQL issues exist
         run: |
-          apt-get update && apt-get install -y jq
+          sudo apt-get update && sudo apt-get install -y jq
           SARIF_FILE=$(find results -name '*.sarif')
           echo "Checking SARIF: $SARIF_FILE"
-
-          # Count critical or high severity findings
-          count=$(jq '[.runs[].results[] | select(.level=="error" or .level=="warning")] | length' "$SARIF_FILE")
-          echo "Number of critical/high issues: $count"
-
+      
+          echo "🧪 SARIF Issue Summary:"
+          jq '.runs[].results[] | {message: .message.text, level: .level}' "$SARIF_FILE"
+      
+          # Fail on any level (for test purposes)
+          count=$(jq '[.runs[].results[] | select(.level=="error" or .level=="warning" or .level=="note")] | length' "$SARIF_FILE")
+          echo "Number of total issues: $count"
+      
           if [ "$count" -gt 0 ]; then
-            echo "❌ Found $count critical/high severity issues. Failing pipeline."
+            echo "❌ Found $count issue(s). Failing pipeline."
             exit 1
           else
-            echo "✅ No critical/high issues found."
+            echo "✅ No issues found."
           fi
