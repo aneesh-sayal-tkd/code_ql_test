@@ -1,69 +1,46 @@
 #include <iostream>
 #include <cstring>
-#include <cstdio>
 #include <cstdlib>
-#include <mysql/mysql.h>
 
 void vulnerable();  
 
-void login(const char* username, const char* password) {
-    MYSQL* conn;
-    conn = mysql_init(NULL);
 
-    // Hardcoded credentials
-    const char* db_user = "admin";
-    const char* db_pass = "password123";
-
-    mysql_real_connect(conn, "localhost", db_user, db_pass, "users_db", 0, NULL, 0);
-
-    // SQL Injection vulnerability
-    char query[512];
-    sprintf(query, "SELECT * FROM users WHERE username='%s' AND password='%s'", username, password);
-
-    mysql_query(conn, query);
-    MYSQL_RES* res = mysql_store_result(conn);
-
-    if (res) {
-        std::cout << "Login successful!" << std::endl;
-    } else {
-        std::cout << "Login failed!" << std::endl;
-    }
-
-    mysql_free_result(res);
-    mysql_close(conn);
+void copyInput(char* input) {
+    char buffer[8];
+    strcpy(buffer, input); // ❌ Potential buffer overflow
+    std::cout << "Copied: " << buffer << std::endl;
 }
 
-void copyName(char* input) {
-    char buffer[10];
-    strcpy(buffer, input);  // Buffer overflow risk
-    std::cout << "Copied name: " << buffer << std::endl;
-}
-
-int main() {
-    char* name = NULL;
-
-    // Null pointer dereference
-    if (strlen(name) > 0) {
-        std::cout << "Name length: " << strlen(name) << std::endl;
-    }
-
-    // Uninitialized variable usage
-    int age;
+void checkAge() {
+    int age; // ❌ Uninitialized variable
     if (age > 18) {
         std::cout << "Adult" << std::endl;
     }
-char username[50], password[50];
+}
 
-std::cout << "Enter username: ";
-fgets(username, sizeof(username), stdin);
-username[strcspn(username, "\n")] = '\0';  // Remove newline
+void printLength(char* str) {
+    // ❌ Null pointer dereference
+    if (strlen(str) > 0) {
+        std::cout << "Length: " << strlen(str) << std::endl;
+    }
+}
 
-std::cout << "Enter password: ";
-fgets(password, sizeof(password), stdin);
-password[strcspn(password, "\n")] = '\0';  // Remove newline
+int main() {
+    // ❌ Hardcoded credentials
+    const char* username = "admin";
+    const char* password = "supersecret123";
 
-    login(username, password);
-    copyName(username);
-       vulnerable();
+    char input[100];
+
+    std::cout << "Enter something: ";
+    std::cin >> input;  // ❌ No bounds checking
+
+    copyInput(input);
+    checkAge();
+
+    char* name = NULL;
+    printLength(name);  // ❌ Dereferencing NULL
+
+      vulnerable();
     return 0;
 }
