@@ -52,14 +52,15 @@ int main() {
     if (age > 18) {
         std::cout << "Adult" << std::endl;
     }
+char username[50], password[50];
 
-    char username[50], password[50];
+std::cout << "Enter username: ";
+fgets(username, sizeof(username), stdin);
+username[strcspn(username, "\n")] = '\0';  // Remove newline
 
-    // Use of gets() - deprecated and unsafe
-    std::cout << "Enter username: ";
-    gets(username);
-    std::cout << "Enter password: ";
-    gets(password);
+std::cout << "Enter password: ";
+fgets(password, sizeof(password), stdin);
+password[strcspn(password, "\n")] = '\0';  // Remove newline
 
     login(username, password);
     copyName(username);
